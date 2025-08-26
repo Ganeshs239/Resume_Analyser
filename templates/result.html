@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Results - CareerCraft</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'fade-in': 'fadeIn 0.8s ease-in-out',
+                        'slide-in-left': 'slideInLeft 0.6s ease-out',
+                        'slide-in-right': 'slideInRight 0.6s ease-out',
+                        'bounce-in': 'bounceIn 0.8s ease-out',
+                        'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+                        'count-up': 'countUp 2s ease-out',
+                        'skill-pop': 'skillPop 0.5s ease-out',
+                        'job-card-hover': 'jobCardHover 0.3s ease-out'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        slideInLeft: {
+                            '0%': { opacity: '0', transform: 'translateX(-50px)' },
+                            '100%': { opacity: '1', transform: 'translateX(0)' }
+                        },
+                        slideInRight: {
+                            '0%': { opacity: '0', transform: 'translateX(50px)' },
+                            '100%': { opacity: '1', transform: 'translateX(0)' }
+                        },
+                        bounceIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.3)' },
+                            '50%': { opacity: '1', transform: 'scale(1.05)' },
+                            '70%': { transform: 'scale(0.9)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' }
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 20px rgba(59, 130, 246, 0.5)' },
+                            '50%': { boxShadow: '0 0 40px rgba(59, 130, 246, 0.8)' }
+                        },
+                        countUp: {
+                            '0%': { transform: 'scale(0.8)' },
+                            '100%': { transform: 'scale(1)' }
+                        },
+                        skillPop: {
+                            '0%': { opacity: '0', transform: 'scale(0.8) rotate(-10deg)' },
+                            '100%': { opacity: '1', transform: 'scale(1) rotate(0deg)' }
+                        },
+                        jobCardHover: {
+                            '0%': { transform: 'translateY(0) scale(1)' },
+                            '100%': { transform: 'translateY(-8px) scale(1.02)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 35%, #8b5cf6 70%, #ec4899 100%);
+            position: relative;
+        }
+        
+        .gradient-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 80%, rgba(120, 219, 255, 0.3) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(180deg); }
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .skill-badge {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .skill-badge:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+        }
+        
+        .job-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .job-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .job-card:hover::before {
+            left: 100%;
+        }
+        
+        .job-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .progress-bar {
+            transition: width 2s ease-in-out;
+        }
+        
+        .stats-counter {
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .floating-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .floating-icon:nth-child(even) {
+            animation-delay: -1.5s;
+        }
+        
+        .celebration-particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #fbbf24;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: celebrate 2s ease-out forwards;
+        }
+        
+        @keyframes celebrate {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) scale(0);
+                opacity: 0;
+            }
+        }
+
+        html, body {
+            height: auto;
+            overflow-x: hidden;
+        }
+
+        .main-content {
+            position: relative;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+    <!-- Navigation -->
+    <nav class="glass-card p-4 animate-fade-in sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="/" class="text-white text-2xl font-bold hover:text-blue-200 transition-colors">
+                <i class="fas fa-briefcase mr-2"></i>CareerCraft
+            </a>
+            <div class="flex space-x-4">
+                <a href="/" class="text-white hover:text-blue-200 transition-colors">
+                    <i class="fas fa-home mr-2"></i>New Analysis
+                </a>
+            </div>
+
+             <!-- <div class="flex space-x-4">
+                <a href="/" class="text-white hover:text-blue-200 transition-colors">
+                    <i class="fas fa-home mr-2"></i>New Analysis
+                </a>
+                <a href="/#about" class="text-white hover:text-blue-200 transition-colors">
+                    <i class="fas fa-info-circle mr-2"></i>About
+                </a>
+                <a href="/#contact" class="text-white hover:text-blue-200 transition-colors">
+                    <i class="fas fa-envelope mr-2"></i>Contact
+                </a>
+            </div> -->
+
+
+
+
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="container mx-auto px-4 py-8">
+            <!-- Header Section -->
+            <div class="text-center mb-12 animate-bounce-in">
+                <h1 class="text-4xl md:text-6xl font-bold text-white mb-4">
+                    <i class="fas fa-chart-line mr-4 text-green-400 floating-icon"></i>
+                    Analysis Complete!
+                </h1>
+                <p class="text-xl text-blue-100 mb-2">Your resume has been analyzed successfully</p>
+                <p class="text-sm text-blue-200">Analysis completed at: {{ analysis_timestamp }}</p>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="grid md:grid-cols-3 gap-6 mb-12">
+                <div class="glass-card rounded-2xl p-6 text-center animate-slide-in-left">
+                    <div class="text-4xl text-blue-400 mb-3">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <div class="stats-counter text-3xl font-bold text-white mb-2" data-target="{{ total_skills_found }}">0</div>
+                    <p class="text-blue-200">Skills Detected</p>
+                </div>
+                
+                <div class="glass-card rounded-2xl p-6 text-center animate-fade-in" style="animation-delay: 0.2s;">
+                    <div class="text-4xl text-green-400 mb-3">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <div class="stats-counter text-3xl font-bold text-white mb-2" data-target="{{ total_jobs_matched }}">0</div>
+                    <p class="text-blue-200">Job Matches</p>
+                </div>
+                
+                <div class="glass-card rounded-2xl p-6 text-center animate-slide-in-right" style="animation-delay: 0.4s;">
+                    <div class="text-4xl text-yellow-400 mb-3">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="stats-counter text-3xl font-bold text-white mb-2" data-target="{% if job_matches %}{{ job_matches[0]['Match Percentage'] }}{% else %}0{% endif %}">0</div>
+                    <p class="text-blue-200">Best Match %</p>
+                </div>
+            </div>
+
+            <!-- Detected Skills Section -->
+            <div class="glass-card rounded-3xl p-8 mb-12 animate-fade-in" style="animation-delay: 0.6s;">
+                <h2 class="text-3xl font-bold text-white mb-6 text-center">
+                    <i class="fas fa-brain mr-3 text-purple-400"></i>
+                    Detected Skills
+                </h2>
+                {% if skills %}
+                    <div class="flex flex-wrap gap-3 justify-center">
+                        {% for skill in skills %}
+                            <span class="skill-badge bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium animate-skill-pop hover:shadow-lg" 
+                            style=`animation-delay: {{ loop.index0 * 0.1 }}s;`>
+                                <i class="fas fa-check-circle mr-2"></i>{{ skill }}
+                            </span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center text-blue-200">
+                        <i class="fas fa-exclamation-triangle text-4xl mb-4"></i>
+                        <p>No skills were detected in your resume. Try uploading a more detailed resume.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Job Matches Section -->
+            <div class="animate-fade-in" style="animation-delay: 0.8s;">
+                <h2 class="text-3xl font-bold text-white mb-8 text-center">
+                    <i class="fas fa-rocket mr-3 text-orange-400"></i>
+                    Perfect Job Matches
+                </h2>
+                
+                {% if job_matches %}
+                    <div class="grid gap-6">
+                        {% for job in job_matches %}
+                            <div class="job-card glass-card rounded-2xl p-6 animate-fade-in" 
+                                 style=`animation-delay: {{ loop.index0 * 0.1 + 1 }}s;`>
+                                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+                                    <div class="flex-1">
+                                        <h3 class="text-2xl font-bold text-white mb-2">
+                                            <i class="fas fa-briefcase mr-2 text-blue-400"></i>
+                                            {{ job['Job Title'] }}
+                                        </h3>
+                                        <p class="text-blue-200 text-lg">
+                                            <i class="fas fa-industry mr-2"></i>{{ job['Industry'] }}
+                                        </p>
+                                    </div>
+                                    <div class="mt-4 md:mt-0 text-center">
+                                        <div class="bg-gradient-to-r from-green-500 to-blue-500 text-white px-6 py-3 rounded-full text-xl font-bold animate-pulse-glow">
+                                            {{ job['Match Percentage'] }}% Match
+                                        </div>
+                                        <p class="text-blue-200 text-sm mt-2">
+                                            {{ job['Match Count'] }}/{{ job['Total Required'] }} skills
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Progress Bar -->
+                                <div class="mb-6">
+                                    <div class="flex justify-between text-sm text-blue-200 mb-2">
+                                        <span>Skill Match Progress</span>
+                                        <span>{{ job['Match Percentage'] }}%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-700 rounded-full h-3">
+                                        <div class="progress-bar bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full animate-pulse-glow" 
+                                             style=`width: {{ job['Match Percentage'] }}%`></div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Skills Breakdown -->
+                                <div class="grid md:grid-cols-2 gap-6">
+                                    <div>
+                                        <h4 class="text-lg font-semibold text-green-400 mb-3">
+                                            <i class="fas fa-check-circle mr-2"></i>
+                                            Matching Skills ({{ job['Match Count'] }})
+                                        </h4>
+                                        <div class="flex flex-wrap gap-2">
+                                            {% for skill in job['Matching Skills'] %}
+                                                <span class="bg-green-500 bg-opacity-20 text-green-300 px-3 py-1 rounded-full text-sm border border-green-400">
+                                                    <i class="fas fa-star mr-1"></i>{{ skill }}
+                                                </span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <h4 class="text-lg font-semibold text-orange-400 mb-3">
+                                            <i class="fas fa-lightbulb mr-2"></i>
+                                            Skills to Develop
+                                        </h4>
+                                        <div class="flex flex-wrap gap-2">
+                                            {% for skill in job['Required Skills'] %}
+                                                {% if skill not in job['Matching Skills'] %}
+                                                    <span class="bg-orange-500 bg-opacity-20 text-orange-300 px-3 py-1 rounded-full text-sm border border-orange-400">
+                                                        <i class="fas fa-plus mr-1"></i>{{ skill }}
+                                                    </span>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="glass-card rounded-2xl p-12 text-center">
+                        <div class="text-6xl text-blue-400 mb-6">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-4">No Job Matches Found</h3>
+                        <p class="text-blue-200 mb-6">We couldn't find any job matches based on your current skills. This might happen if:</p>
+                        <ul class="text-blue-200 text-left max-w-md mx-auto space-y-2">
+                            <li><i class="fas fa-arrow-right mr-2 text-blue-400"></i>Your resume needs more detailed skill descriptions</li>
+                            <li><i class="fas fa-arrow-right mr-2 text-blue-400"></i>The skills format isn't recognized by our system</li>
+                            <li><i class="fas fa-arrow-right mr-2 text-blue-400"></i>Your skills don't match our current job database</li>
+                        </ul>
+                        <div class="mt-8">
+                            <a href="/" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-full font-semibold hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105">
+                                <i class="fas fa-upload mr-2"></i>Try Another Resume
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="text-center mt-12 space-y-4 md:space-y-0 md:space-x-4 animate-fade-in" style="animation-delay: 1.5s;">
+                <a href="/" 
+                   class="inline-block bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-4 px-8 rounded-full text-lg hover:from-blue-600 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-blue-500/50">
+                    <i class="fas fa-upload mr-3"></i>Analyze Another Resume
+                </a>
+                
+                <button onclick="window.print()" 
+                        class="inline-block bg-gradient-to-r from-green-500 to-teal-600 text-white font-bold py-4 px-8 rounded-full text-lg hover:from-green-600 hover:to-teal-700 transform hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-green-500/50">
+                    <i class="fas fa-print mr-3"></i>Print Results
+                </button>
+                
+                <button onclick="shareResults()" 
+                        class="inline-block bg-gradient-to-r from-pink-500 to-rose-600 text-white font-bold py-4 px-8 rounded-full text-lg hover:from-pink-600 hover:to-rose-700 transform hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-pink-500/50">
+                    <i class="fas fa-share-alt mr-3"></i>Share Results
+                </button>
+            </div>
+
+            <!-- Tips Section -->
+            <div class="glass-card rounded-3xl p-8 mt-12 animate-fade-in" style="animation-delay: 1.8s;">
+                <h2 class="text-2xl font-bold text-white mb-6 text-center">
+                    <i class="fas fa-lightbulb mr-3 text-yellow-400"></i>
+                    Career Enhancement Tips
+                </h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="text-center">
+                        <div class="text-3xl text-blue-400 mb-3">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-white mb-2">Skill Development</h3>
+                        <p class="text-blue-200 text-sm">Focus on learning the skills you're missing for your target jobs</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="text-3xl text-green-400 mb-3">
+                            <i class="fas fa-network-wired"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-white mb-2">Networking</h3>
+                        <p class="text-blue-200 text-sm">Connect with professionals in your target industries</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="text-3xl text-purple-400 mb-3">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-white mb-2">Resume Optimization</h3>
+                        <p class="text-blue-200 text-sm">Tailor your resume with keywords from job descriptions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="glass-card p-6 text-center text-white mt-12">
+        <div class="container mx-auto">
+            <p>CareerCraft. Built By Ashish Dubey ❤️ for career recognizon.</p>
+            <!-- <div class="mt-4 space-x-4">
+                <button class="hover:text-blue-200 transition-colors">Privacy Policy</button>
+                <button class="hover:text-blue-200 transition-colors">Terms of Service</button>
+                <button class="hover:text-blue-200 transition-colors">Support</button>
+            </div> -->
+        </div>
+    </footer>
+
+    <script>
+         // Counter animation
+        function animateCounters() {
+            const counters = document.querySelectorAll('.stats-counter');
+            
+            counters.forEach(counter => {
+                const target = parseInt(counter.getAttribute('data-target'));
+                const duration = 2000;
+                const step = target / (duration / 16);
+                let current = 0;
+                
+                const timer = setInterval(() => {
+                    current += step;
+                    if (current >= target) {
+                        counter.textContent = target;
+                        clearInterval(timer);
+                    } else {
+                        counter.textContent = Math.floor(current);
+                    }
+                }, 16);
+            });
+        }
+
+        // Progress bar animation
+        function animateProgressBars() {
+            const progressBars = document.querySelectorAll('.progress-bar');
+            
+            progressBars.forEach((bar, index) => {
+                setTimeout(() => {
+                    const width = bar.style.width;
+                    bar.style.width = '0%';
+                    setTimeout(() => {
+                        bar.style.width = width;
+                    }, 100);
+                }, index * 200);
+            });
+        }
+
+        // Celebration particles
+        function createCelebrationParticles() {
+            const colors = ['#fbbf24', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899'];
+            
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'celebration-particle';
+                    particle.style.left = Math.random() * window.innerWidth + 'px';
+                    particle.style.top = window.innerHeight + 'px';
+                    particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    document.body.appendChild(particle);
+                    
+                    setTimeout(() => {
+                        particle.remove();
+                    }, 2000);
+                }, i * 100);
+            }
+        }
+
+        // Share functionality
+        function shareResults() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'My CareerCraft Analysis Results',
+                    text: 'Check out my resume analysis results from CareerCraft AI!',
+                    url: window.location.href
+                });
+            } else {
+                // Fallback for browsers that don't support Web Share API
+                const url = window.location.href;
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('Results URL copied to clipboard!');
+                });
+            }
+        }
+
+        // Skill badge hover effects
+        function initSkillBadges() {
+            const skillBadges = document.querySelectorAll('.skill-badge');
+            
+            skillBadges.forEach(badge => {
+                badge.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-3px) scale(1.05) rotate(2deg)';
+                });
+                
+                badge.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1) rotate(0deg)';
+                });
+            });
+        }
+
+        // Job card interactions
+        function initJobCards() {
+            const jobCards = document.querySelectorAll('.job-card');
+            
+            jobCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px) scale(1.02)';
+                    this.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.2)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                    this.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.1)';
+                });
+            });
+        }
+
+        // Initialize everything when page loads
+        window.addEventListener('load', function() {
+            setTimeout(animateCounters, 500);
+            setTimeout(animateProgressBars, 1000);
+            setTimeout(createCelebrationParticles, 1500);
+            initSkillBadges();
+            initJobCards();
+            
+            // Add loading animation
+            document.body.classList.add('animate-fade-in');
+        });
+
+        // Smooth scrolling
+        document.documentElement.style.scrollBehavior = 'smooth';
+
+        // Add intersection observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-fade-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all animatable elements
+        document.querySelectorAll('.glass-card, .job-card').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Print styles
+        window.addEventListener('beforeprint', function() {
+            document.body.style.background = 'white';
+        });
+
+        window.addEventListener('afterprint', function() {
+            document.body.style.background = '';
+        });
+    </script>
+</body>
+</html>

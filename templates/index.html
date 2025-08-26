@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerCraft - AI Resume Analyzer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-slow': 'bounce 2s infinite',
+                        'fade-in': 'fadeIn 1s ease-in-out',
+                        'slide-up': 'slideUp 0.8s ease-out',
+                        'glow': 'glow 2s ease-in-out infinite alternate'
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' }
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(30px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        },
+                        glow: {
+                            '0%': { boxShadow: '0 0 20px rgba(99, 102, 241, 0.5)' },
+                            '100%': { boxShadow: '0 0 30px rgba(99, 102, 241, 0.8)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+        }
+        
+        .gradient-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="g" cx="50%" cy="50%" r="50%"><stop offset="0%" style="stop-color:rgba(255,255,255,0.1)"/><stop offset="100%" style="stop-color:rgba(255,255,255,0)"/></radialGradient></defs><circle cx="50" cy="50" r="50" fill="url(%23g)"/></svg>') center/200px 200px;
+            animation: float 10s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+        
+        .file-input-label {
+            cursor: pointer;
+            display: block;
+            transition: all 0.3s ease;
+        }
+        
+        .file-input-label:hover {
+            transform: translateY(-2px);
+        }
+        
+        .upload-icon {
+            transition: all 0.3s ease;
+        }
+        
+        .file-input-label:hover .upload-icon {
+            transform: scale(1.1);
+        }
+        
+        .particle {
+            position: fixed;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particle-float 4s infinite linear;
+            z-index: 1;
+        }
+        
+        @keyframes particle-float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .feature-card {
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px) scale(1.02);
+        }
+
+        /* Ensure proper scrolling */
+        html, body {
+            height: auto;
+            overflow-x: hidden;
+        }
+
+        .main-content {
+            position: relative;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="gradient-bg">
+    <!-- Floating Particles -->
+    <div id="particles-container" class="fixed inset-0 pointer-events-none z-0"></div>
+    
+    <!-- Navigation Header -->
+    <nav class="glass-morphism p-4 animate-fade-in sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="text-white text-2xl font-bold">
+                <i class="fas fa-briefcase mr-2"></i>CareerCraft By Ganesh Kumar Singh
+            </div>
+            <!-- <div class="hidden md:flex space-x-6 text-white">
+                <button class="hover:text-blue-200 transition-colors">Home</button>
+                <button class="hover:text-blue-200 transition-colors">About</button>
+                <button class="hover:text-blue-200 transition-colors">Contact</button>
+            </div> -->
+             <div class="hidden md:flex space-x-6 text-white">
+                <button onclick="scrollToSection('home')" class="hover:text-blue-200 transition-colors">Home</button>
+                
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container mx-auto px-4 py-8">
+            <!-- Hero Section -->
+            <div class="text-center mb-12 animate-slide-up py-20">
+                <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 animate-bounce-slow">
+                    <i class="fas fa-robot mr-4 animate-pulse-slow"></i>
+                    CareerCraft
+                </h1>
+                <p class="text-xl md:text-2xl text-blue-100 mb-4">
+                    AI-Powered Resume Analysis & Job Matching
+                </p>
+                <p class="text-lg text-blue-200 max-w-2xl mx-auto">
+                    Upload your resume and discover perfect job matches using advanced AI technology. 
+                    Get personalized career recommendations in seconds.
+                </p>
+            </div>
+
+            <!-- Upload Form -->
+            <div class="glass-morphism rounded-3xl p-8 mb-12 animate-glow max-w-4xl mx-auto">
+                <form action="/analyze" method="post" enctype="multipart/form-data" class="space-y-8">
+                    <!-- File Upload Section -->
+                    <div class="text-center">
+                        <h3 class="text-2xl font-semibold text-white mb-6">
+                            <i class="fas fa-upload mr-3"></i>Upload Your Resume
+                        </h3>
+                        
+                        <div class="file-input-wrapper">
+                            <input type="file" name="resume" id="resume" required accept=".pdf,.doc,.docx,.txt">
+                            <label for="resume" class="file-input-label block">
+                                <div class="border-2 border-dashed border-blue-300 rounded-2xl p-12 hover:border-blue-200 transition-all duration-300 hover:bg-white hover:bg-opacity-10">
+                                    <div class="upload-icon text-6xl text-blue-200 mb-4">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                    </div>
+                                    <p class="text-xl text-white mb-2">Click to upload or drag and drop</p>
+                                    <p class="text-blue-200">PDF, DOC, DOCX, TXT files supported</p>
+                                    <p class="text-sm text-blue-300 mt-2">Maximum file size: 16MB</p>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div id="file-info" class="mt-4 text-white hidden">
+                            <i class="fas fa-file-alt mr-2"></i>
+                            <span id="file-name"></span>
+                            <span id="file-size" class="ml-2 text-blue-200"></span>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="text-center">
+                        <button type="submit" id="analyze-btn" 
+                                class="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-4 px-12 rounded-full text-xl hover:from-blue-600 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-blue-500/50">
+                            <i class="fas fa-magic mr-3"></i>
+                            <span id="btn-text">Analyze Resume</span>
+                            <div id="loading-spinner" class="hidden inline-block ml-3">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </div>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Features Section -->
+            <div class="grid md:grid-cols-3 gap-8 animate-fade-in mb-12">
+                <div class="feature-card glass-morphism rounded-2xl p-6 text-center">
+                    <div class="text-4xl text-blue-200 mb-4 animate-pulse-slow">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-3">AI-Powered Analysis</h3>
+                    <p class="text-blue-100">Advanced algorithms extract and analyze skills from your resume</p>
+                </div>
+                
+                <div class="feature-card glass-morphism rounded-2xl p-6 text-center">
+                    <div class="text-4xl text-green-200 mb-4 animate-float">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-3">Perfect Job Matching</h3>
+                    <p class="text-blue-100">Get matched with jobs that align with your skills and experience</p>
+                </div>
+                
+                <div class="feature-card glass-morphism rounded-2xl p-6 text-center">
+                    <div class="text-4xl text-yellow-200 mb-4 animate-bounce-slow">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-3">Instant Results</h3>
+                    <p class="text-blue-100">Get comprehensive analysis and job recommendations in seconds</p>
+                </div>
+            </div>
+
+            <!-- How It Works Section -->
+            <div class="glass-morphism rounded-3xl p-8 mb-12">
+                <h2 class="text-3xl font-bold text-white text-center mb-8">
+                    <i class="fas fa-cogs mr-3"></i>How It Works
+                </h2>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="text-center">
+                        <div class="text-5xl text-blue-300 mb-4">
+                            <i class="fas fa-file-upload"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-white mb-3">1. Upload Resume</h3>
+                        <p class="text-blue-100">Upload your resume in PDF, DOC, or TXT format</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-5xl text-green-300 mb-4">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-white mb-3">2. AI Analysis</h3>
+                        <p class="text-blue-100">Our AI extracts skills and analyzes your qualifications</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-5xl text-yellow-300 mb-4">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-white mb-3">3. Get Matches</h3>
+                        <p class="text-blue-100">Receive personalized job recommendations with match scores</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Benefits Section -->
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-white mb-8">
+                    <i class="fas fa-trophy mr-3"></i>Why Choose CareerCraft?
+                </h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="glass-morphism rounded-xl p-4">
+                        <i class="fas fa-zap text-3xl text-yellow-400 mb-3"></i>
+                        <h4 class="text-white font-semibold mb-2">Lightning Fast</h4>
+                        <p class="text-blue-200 text-sm">Get results in under 30 seconds</p>
+                    </div>
+                    <div class="glass-morphism rounded-xl p-4">
+                        <i class="fas fa-shield-alt text-3xl text-green-400 mb-3"></i>
+                        <h4 class="text-white font-semibold mb-2">100% Secure</h4>
+                        <p class="text-blue-200 text-sm">Your data is encrypted and protected</p>
+                    </div>
+                    <div class="glass-morphism rounded-xl p-4">
+                        <i class="fas fa-chart-line text-3xl text-blue-400 mb-3"></i>
+                        <h4 class="text-white font-semibold mb-2">Accurate Matching</h4>
+                        <p class="text-blue-200 text-sm">AI-powered precision matching</p>
+                    </div>
+                    <div class="glass-morphism rounded-xl p-4">
+                        <i class="fas fa-mobile-alt text-3xl text-purple-400 mb-3"></i>
+                        <h4 class="text-white font-semibold mb-2">Mobile Friendly</h4>
+                        <p class="text-blue-200 text-sm">Works perfectly on all devices</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="glass-morphism p-6 text-center text-white">
+        <div class="container mx-auto">
+            <p>CareerCraft. Built By Ganesh Kumar Singh ❤️ for career recognizon.</p>
+            <!-- <div class="mt-4 space-x-4">
+                <button class="hover:text-blue-200 transition-colors">Privacy Policy</button>
+                <button class="hover:text-blue-200 transition-colors">Terms of Service</button>
+                <button class="hover:text-blue-200 transition-colors">Support</button>
+            </div> -->
+        </div>
+    </footer>
+
+    <script src="index.js"></script>
+        
+</body>
+</html>
